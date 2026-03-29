@@ -7,7 +7,7 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.util.Collection;
 import java.util.Collections;
 
-public final class SidebarScoreboard implements GenericScoreboard {
+public final class SidebarScoreboard extends GenericNmsScoreboard implements GenericScoreboard {
 
     @Override
     public @NotNull Component title() {
