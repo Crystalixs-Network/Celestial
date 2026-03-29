@@ -2,17 +2,14 @@ package net.crystalixy.celestial.api;
 
 import io.papermc.paper.adventure.PaperAdventure;
 import net.kyori.adventure.text.Component;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.numbers.BlankFormat;
 import net.minecraft.network.chat.numbers.FixedFormat;
 import net.minecraft.network.chat.numbers.NumberFormat;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientboundResetScorePacket;
-import net.minecraft.network.protocol.game.ClientboundSetDisplayObjectivePacket;
-import net.minecraft.network.protocol.game.ClientboundSetObjectivePacket;
-import net.minecraft.network.protocol.game.ClientboundSetScorePacket;
+import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.scores.DisplaySlot;
-import net.minecraft.world.scores.Objective;
+import net.minecraft.world.scores.*;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.bukkit.ChatColor;
@@ -38,6 +35,10 @@ public abstract class GenericNmsScoreboard {
 
     protected GenericNmsScoreboard(Player player) {
         this.player = player;
+    }
+
+    protected Component lineByScore(List<Component> lines, int score) {
+        return score < lines.size() ? lines.get(lines.size() - score - 1) : null;
     }
 
     protected void sendObjectivePacket(ObjectiveLifecycle lifecycle, String uniqueName, Component title) {
@@ -71,8 +72,38 @@ public abstract class GenericNmsScoreboard {
         sendPacket(packet);
     }
 
-    private Component lineByScore(List<Component> lines, int score) {
-        return score < lines.size() ? lines.get(lines.size() - score - 1) : null;
+    protected void sendTeamPacket(String uniqueName, int score, TeamLifecycle lifecycle, Component prefix, Component suffix) {
+        if (lifecycle == TeamLifecycle.ADD_PLAYERS || lifecycle == TeamLifecycle.REMOVE_PLAYERS) {
+            throw new UnsupportedOperationException();
+        }
+
+        String teamName = uniqueName + ":" + score;
+        String entry = LEGACY_ENTRIES[score];
+
+        PlayerTeam team = new PlayerTeam(scoreboard, teamName);
+        team.setDisplayName(net.minecraft.network.chat.Component.empty());
+        team.setNameTagVisibility(Team.Visibility.ALWAYS);
+        team.setCollisionRule(Team.CollisionRule.ALWAYS);
+        team.setColor(ChatFormatting.RESET);
+        team.setPlayerPrefix(toVanillaComponent(prefix));
+        team.setPlayerSuffix(toVanillaComponent(suffix));
+
+        if (lifecycle == TeamLifecycle.REMOVE) {
+            var packet = ClientboundSetPlayerTeamPacket.createRemovePacket(team);
+            sendPacket(packet);
+            return;
+        }
+
+        boolean shouldCreate = lifecycle == TeamLifecycle.CREATE;
+        if (shouldCreate) {
+            team.getPlayers().add(entry);
+        }
+        var packet = ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, shouldCreate);
+        sendPacket(packet);
+    }
+
+    protected void sendTeamPacket(String uniqueName, int score, TeamLifecycle lifecycle) {
+        sendTeamPacket(uniqueName, score, lifecycle, null, null);
     }
 
     private void sendPacket(Packet<?> packet) {
@@ -101,4 +132,6 @@ public abstract class GenericNmsScoreboard {
     public enum ObjectiveLifecycle {CREATE, REMOVE, UPDATE}
 
     public enum ScoreboardLifecycle {CREATE, REMOVE, UPDATE}
+
+    public enum TeamLifecycle {CREATE, REMOVE, UPDATE, ADD_PLAYERS, REMOVE_PLAYERS}
 }
