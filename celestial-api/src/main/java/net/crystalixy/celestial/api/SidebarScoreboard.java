@@ -3,6 +3,7 @@ package net.crystalixy.celestial.api;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.*;
@@ -13,11 +14,11 @@ import static net.kyori.adventure.text.Component.empty;
 public final class SidebarScoreboard extends GenericNmsScoreboard implements GenericScoreboard {
 
     private final LinkedList<Component> lines;
-    private final LinkedList<Component> scores;
+    private final LinkedList<@Nullable Component> scores;
     private final String name;
     private Component title;
 
-    public SidebarScoreboard(Player player, Component title, LinkedList<Component> lines, LinkedList<Component> scores) {
+    public SidebarScoreboard(Player player, Component title, LinkedList<Component> lines, LinkedList<@Nullable Component> scores) {
         super(player);
         this.title = title;
         this.lines = lines;
@@ -42,7 +43,7 @@ public final class SidebarScoreboard extends GenericNmsScoreboard implements Gen
     }
 
     @Override
-    public @NotNull Component score(int line) {
+    public @Nullable Component score(int line) {
         validateLine(line, true, false);
         return scores.get(line);
     }
@@ -70,16 +71,16 @@ public final class SidebarScoreboard extends GenericNmsScoreboard implements Gen
 
     @Override
     public void updateLine(int line, @NotNull Component text) {
-        updateLine(line, text, empty());
+        updateLine(line, text, null);
     }
 
     @Override
-    public void updateLine(int line, @NotNull Component text, @NotNull Component score) {
+    public void updateLine(int line, @NotNull Component text, @Nullable Component score) {
         validateLine(line, false, false);
 
         if (line < lines.size()) {
             lines.set(line, text);
-            if (!scores.isEmpty()) scores.set(line, score);
+            scores.set(line, score);
 
             int scoreIndex = scoreByLine(line);
             sendLineChange(scoreIndex);
@@ -93,7 +94,7 @@ public final class SidebarScoreboard extends GenericNmsScoreboard implements Gen
         if (line > lines.size()) {
             for (int i = lines.size(); i < line; i++) {
                 newLines.add(empty());
-                newScores.add(empty());
+                newScores.add(null);
             }
         }
 
@@ -105,23 +106,21 @@ public final class SidebarScoreboard extends GenericNmsScoreboard implements Gen
 
     @Override
     public void updateLines(@NotNull Collection<@NotNull Component> lines) {
-        updateLines(lines, Collections.emptyList());
+        updateLines(lines, null);
     }
 
     @Override
-    public synchronized void updateLines(@NotNull Collection<@NotNull Component> lines, @NotNull Collection<@NotNull Component> scores) {
+    public synchronized void updateLines(@NotNull Collection<@NotNull Component> lines, @Nullable Collection<@Nullable Component> scores) {
         validateLine(lines.size(), false, true);
 
-        if (scores.size() != lines.size()) {
-            throw new IllegalArgumentException("Number of scores must be equal to the number of lines");
-        }
-
         List<Component> oldLines = new LinkedList<>(this.lines);
+        List<Component> normalizedScores = normalizeScores(lines.size(), scores);
+
         this.lines.clear();
         this.lines.addAll(lines);
 
         this.scores.clear();
-        this.scores.addAll(scores);
+        this.scores.addAll(normalizedScores);
 
         int lineSize = this.lines.size();
         if (oldLines.size() != lineSize) {
@@ -153,17 +152,14 @@ public final class SidebarScoreboard extends GenericNmsScoreboard implements Gen
 
         List<Component> newLines = new LinkedList<>(lines);
         List<Component> newScores = new LinkedList<>(scores);
-
-        if (!scores.isEmpty()) {
-            newScores.remove(line);
-        }
+        newScores.remove(line);
         newLines.remove(line);
 
-        updateLines(newLines, scores.isEmpty() ? Collections.emptyList() : newScores);
+        updateLines(newLines, newScores);
     }
 
     @Override
-    public void updateScore(int line, @NotNull Component text) {
+    public void updateScore(int line, @Nullable Component text) {
         validateLine(line, true, false);
 
         scores.set(line, text);
@@ -171,12 +167,8 @@ public final class SidebarScoreboard extends GenericNmsScoreboard implements Gen
     }
 
     @Override
-    public synchronized void updateScores(@NotNull Collection<@NotNull Component> scores) {
-        if (scores.size() != lines.size()) {
-            throw new IllegalArgumentException("Number of scores must be equal to the number of lines");
-        }
-
-        List<Component> newScores = new LinkedList<>(scores);
+    public synchronized void updateScores(@Nullable Collection<@Nullable Component> scores) {
+        List<Component> newScores = normalizeScores(lines.size(), scores);
         for (int i = 0; i < lines.size(); i++) {
             if (Objects.equals(this.scores.get(i), newScores.get(i))) {
                 continue;
@@ -188,7 +180,7 @@ public final class SidebarScoreboard extends GenericNmsScoreboard implements Gen
 
     @Override
     public void removeScore(int line) {
-        updateScore(line, empty());
+        updateScore(line, null);
     }
 
     private void validateLine(int line, boolean checkInRange, boolean checkMax) {
@@ -218,5 +210,20 @@ public final class SidebarScoreboard extends GenericNmsScoreboard implements Gen
             sendTeamPacket(name, i, TeamLifecycle.CREATE);
             sendLineChange(i);
         }
+    }
+
+    private static List<Component> normalizeScores(int targetSize, @Nullable Collection<@Nullable Component> scores) {
+        List<Component> normalized = new LinkedList<>();
+
+        if (scores != null) {
+            if (scores.size() > targetSize) {
+                throw new IllegalArgumentException("Number of scores cannot be greater than the number of lines");
+            }
+            normalized.addAll(scores);
+        }
+        while (normalized.size() < targetSize) {
+            normalized.add(null);
+        }
+        return normalized;
     }
 }

@@ -2,6 +2,7 @@ package net.crystalixy.celestial.api;
 
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Collection;
@@ -15,7 +16,7 @@ public interface Scoreboard {
 
     @NotNull Component line(int line);
 
-    @NotNull Component score(int line);
+    @Nullable Component score(int line);
 
     void display();
 
@@ -25,17 +26,17 @@ public interface Scoreboard {
 
     void updateLine(int line, @NotNull Component text);
 
-    void updateLine(int line, @NotNull Component text, @NotNull Component score);
+    void updateLine(int line, @NotNull Component text, @Nullable Component score);
 
     void updateLines(@NotNull Collection<@NotNull Component> lines);
 
-    void updateLines(@NotNull Collection<@NotNull Component> lines, @NotNull Collection<@NotNull Component> scores);
+    void updateLines(@NotNull Collection<@NotNull Component> lines, @Nullable Collection<@Nullable Component> scores);
 
     void removeLine(int line);
 
-    void updateScore(int line, @NotNull Component text);
+    void updateScore(int line, @Nullable Component text);
 
-    void updateScores(@NotNull Collection<@NotNull Component> scores);
+    void updateScores(@Nullable Collection<@Nullable Component> scores);
 
     void removeScore(int line);
 

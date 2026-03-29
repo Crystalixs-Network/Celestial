@@ -3,9 +3,9 @@ package net.crystalixy.celestial.api;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 
 import static java.util.Objects.requireNonNull;
@@ -14,7 +14,7 @@ import static net.kyori.adventure.text.Component.empty;
 public final class SidebarScoreboardBuilder implements GenericScoreboard.Builder {
 
     private final LinkedList<Component> lines = new LinkedList<>();
-    private final LinkedList<Component> scores = new LinkedList<>();
+    private final LinkedList<@Nullable Component> scores = new LinkedList<>();
     private Component title;
     private Player player;
 
@@ -36,40 +36,37 @@ public final class SidebarScoreboardBuilder implements GenericScoreboard.Builder
 
     @Override
     public GenericScoreboard.Builder line(@NotNull Component line) {
-        line(line, empty());
+        line(line, null);
         return this;
     }
 
     @Override
-    public GenericScoreboard.Builder line(@NotNull Component line, @NotNull Component score) {
+    public GenericScoreboard.Builder line(@NotNull Component line, @Nullable Component score) {
         lines.add(requireNonNull(line, "Line cannot be null"));
-        scores.add(requireNonNull(score, "Score cannot be null"));
+        scores.add(score);
         return this;
     }
 
     @Override
     public GenericScoreboard.Builder lines(@NotNull Collection<@NotNull Component> lines) {
-        lines(lines, Collections.emptyList());
+        lines(lines, null);
         return this;
     }
 
     @Override
-    public GenericScoreboard.Builder lines(@NotNull Collection<@NotNull Component> lines, @NotNull Collection<@NotNull Component> scores) {
+    public GenericScoreboard.Builder lines(@NotNull Collection<@NotNull Component> lines, @Nullable Collection<@Nullable Component> scores) {
         requireNonNull(lines, "Lines cannot be null");
-        requireNonNull(scores, "Scores cannot be null");
         requireNoNullElements(lines, "Lines");
-        requireNoNullElements(scores, "Scores");
 
         this.lines.addAll(lines);
-        if (scores.isEmpty()) {
-            for (int i = 0; i < lines.size(); i++) {
-                this.scores.add(empty());
-            }
-        } else {
-            if (scores.size() != lines.size()) {
-                throw new IllegalArgumentException("Scores size must match lines size");
+        if (scores != null) {
+            if (scores.size() > lines.size()) {
+                throw new IllegalArgumentException("Scores size cannot be greater than lines size");
             }
             this.scores.addAll(scores);
+        }
+        for (int i = this.scores.size(); i < this.lines.size(); i++) {
+            this.scores.add(null);
         }
 
         return this;
