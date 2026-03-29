@@ -25,6 +25,7 @@ public final class ExamplePlugin extends JavaPlugin implements Listener {
 
         Scoreboard scoreboard = Scoreboard.sidebar()
                 .withPlayer(player)
+                .title(text("Example Sidebar"))
                 .lines(List.of(
                         empty(),
                         text("Test"),
@@ -34,5 +35,6 @@ public final class ExamplePlugin extends JavaPlugin implements Listener {
                         empty()
                 ))
                 .build();
+        scoreboard.display();
     }
 }
