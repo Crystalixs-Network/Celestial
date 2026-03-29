@@ -1,22 +1,38 @@
 package net.crystalixy.celestial.api;
 
 import net.kyori.adventure.text.Component;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.concurrent.ThreadLocalRandom;
 
 public final class SidebarScoreboard extends GenericNmsScoreboard implements GenericScoreboard {
 
+    private final LinkedList<Component> lines;
+    private final LinkedList<Component> scores;
+    private final String name;
+    private Component title;
+
+    public SidebarScoreboard(Player player, Component title, LinkedList<Component> lines, LinkedList<Component> scores) {
+        super(player);
+        this.title = title;
+        this.lines = lines;
+        this.scores = scores;
+        this.name = "celestial-" + Integer.toHexString(ThreadLocalRandom.current().nextInt());
+    }
+
     @Override
     public @NotNull Component title() {
-        return Component.empty();
+        return title;
     }
 
     @Override
     public @UnmodifiableView @NotNull Collection<@NotNull Component> lines() {
-        return Collections.emptyList();
+        return Collections.unmodifiableCollection(lines);
     }
 
     @Override
@@ -31,6 +47,9 @@ public final class SidebarScoreboard extends GenericNmsScoreboard implements Gen
 
     @Override
     public void display() {
+        sendObjectivePacket(ObjectiveLifecycle.CREATE, name, title);
+        sendDisplayObjectivePacket();
+        sendInitialLines();
     }
 
     @Override
@@ -71,5 +90,18 @@ public final class SidebarScoreboard extends GenericNmsScoreboard implements Gen
 
     @Override
     public void removeScore(int line) {
+    }
+
+    private void sendLineChange(int score) {
+        Component line = lineByScore(this.lines, score);
+        sendTeamPacket(name, score, TeamLifecycle.UPDATE, line, null);
+    }
+
+    private void sendInitialLines() {
+        for (int i = 0; i < lines.size(); i++) {
+            sendScorePacket(name, scores, i, ScoreboardLifecycle.UPDATE);
+            sendTeamPacket(name, i, TeamLifecycle.UPDATE);
+            sendLineChange(i);
+        }
     }
 }
