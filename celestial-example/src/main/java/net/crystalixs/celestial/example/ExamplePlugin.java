@@ -24,15 +24,26 @@ public final class ExamplePlugin extends JavaPlugin implements Listener {
         Player player = event.getPlayer();
 
         Scoreboard scoreboard = Scoreboard.sidebar()
-                .usePlayer(player)
+                .withPlayer(player)
+                .title(text("Example Sidebar"))
                 .lines(List.of(
-                        empty(),
-                        text("Test"),
-                        empty(),
-                        empty(),
-                        text("Test2"),
-                        empty()
-                ))
+                                empty(),
+                                text("Test"),
+                                empty(),
+                                empty(),
+                                text("Test2"),
+                                empty()
+                        ),
+                        List.of(
+                                empty(),
+                                text("Affe"),
+                                empty(),
+                                empty(),
+                                text("lol"),
+                                empty()
+                        )
+                )
                 .build();
+        scoreboard.display();
     }
 }

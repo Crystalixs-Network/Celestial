@@ -64,11 +64,17 @@ public abstract class GenericNmsScoreboard {
         }
 
         Component component = lineByScore(scores, score);
-        NumberFormat format = component == null
-                ? BlankFormat.INSTANCE
-                : new FixedFormat(toVanillaComponent(component));
+        boolean hasDisplayScore = component != null && !component.equals(Component.empty());
 
-        var packet = new ClientboundSetScorePacket(entry, uniqueName, score, Optional.empty(), Optional.of(format));
+        Optional<net.minecraft.network.chat.Component> display = hasDisplayScore
+                ? Optional.of(toVanillaComponent(component))
+                : Optional.empty();
+
+        Optional<NumberFormat> numberFormat = hasDisplayScore
+                ? Optional.of(BlankFormat.INSTANCE)
+                : Optional.of(new FixedFormat(toVanillaComponent(component)));
+
+        var packet = new ClientboundSetScorePacket(entry, uniqueName, score, display, numberFormat);
         sendPacket(packet);
     }
 
