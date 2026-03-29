@@ -31,21 +31,18 @@ public abstract class GenericNmsScoreboard {
             .toArray(String[]::new);
 
     private final Scoreboard scoreboard = new Scoreboard();
-    private final String objectiveName;
     private Objective objective;
 
     private final Player player;
     private boolean isDeleted;
 
-    protected GenericNmsScoreboard(Player player, String objectiveName, Component title) {
+    protected GenericNmsScoreboard(Player player) {
         this.player = player;
-        this.objectiveName = objectiveName;
-        this.objective = createObjective(title);
     }
 
-    protected void sendObjectivePacket(ObjectiveLifecycle lifecycle, Component title) {
+    protected void sendObjectivePacket(ObjectiveLifecycle lifecycle, String uniqueName, Component title) {
         if (lifecycle == ObjectiveLifecycle.CREATE) {
-            this.objective = createObjective(title);
+            this.objective = createObjective(title, uniqueName);
         }
         var packet = new ClientboundSetObjectivePacket(objective, lifecycle.ordinal());
         sendPacket(packet);
@@ -56,11 +53,11 @@ public abstract class GenericNmsScoreboard {
         sendPacket(packet);
     }
 
-    protected void sendScorePacket(List<Component> scores, int score, ScoreboardLifecycle lifecycle) {
+    protected void sendScorePacket(String uniqueName, List<Component> scores, int score, ScoreboardLifecycle lifecycle) {
         String entry = LEGACY_ENTRIES[score];
 
         if (lifecycle == ScoreboardLifecycle.REMOVE) {
-            var packet = new ClientboundResetScorePacket(entry, objectiveName);
+            var packet = new ClientboundResetScorePacket(entry, uniqueName);
             sendPacket(packet);
             return;
         }
@@ -70,7 +67,7 @@ public abstract class GenericNmsScoreboard {
                 ? BlankFormat.INSTANCE
                 : new FixedFormat(toVanillaComponent(component));
 
-        var packet = new ClientboundSetScorePacket(entry, objectiveName, score, Optional.empty(), Optional.of(format));
+        var packet = new ClientboundSetScorePacket(entry, uniqueName, score, Optional.empty(), Optional.of(format));
         sendPacket(packet);
     }
 
@@ -85,9 +82,9 @@ public abstract class GenericNmsScoreboard {
         serverPlayer.connection.send(packet);
     }
 
-    private Objective createObjective(Component title) {
+    private Objective createObjective(Component title, String uniqueName) {
         return scoreboard.addObjective(
-                objectiveName,
+                uniqueName,
                 ObjectiveCriteria.DUMMY,
                 toVanillaComponent(title),
                 ObjectiveCriteria.RenderType.INTEGER,
