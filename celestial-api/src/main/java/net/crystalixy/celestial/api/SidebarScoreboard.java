@@ -100,7 +100,7 @@ public final class SidebarScoreboard extends GenericNmsScoreboard implements Gen
     private void sendInitialLines() {
         for (int i = 0; i < lines.size(); i++) {
             sendScorePacket(name, scores, i, ScoreboardLifecycle.UPDATE);
-            sendTeamPacket(name, i, TeamLifecycle.UPDATE);
+            sendTeamPacket(name, i, TeamLifecycle.CREATE);
             sendLineChange(i);
         }
     }
