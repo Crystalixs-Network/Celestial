@@ -6,7 +6,6 @@ plugins {
 
 dependencies {
     compileOnly(libs.paper)
-    implementation(project(":common"))
 }
 
 tasks {
