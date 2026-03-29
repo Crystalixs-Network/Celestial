@@ -56,7 +56,7 @@ public final class SidebarScoreboardBuilder implements GenericScoreboard.Builder
     @Override
     public GenericScoreboard.Builder lines(@NotNull Collection<@NotNull Component> lines, @Nullable Collection<@Nullable Component> scores) {
         requireNonNull(lines, "Lines cannot be null");
-        requireNoNullElements(lines, "Lines");
+        requireNoNullElements(lines);
 
         this.lines.addAll(lines);
         if (scores != null) {
@@ -86,10 +86,10 @@ public final class SidebarScoreboardBuilder implements GenericScoreboard.Builder
         return new SidebarScoreboard(player, title, lines, scores);
     }
 
-    private static void requireNoNullElements(Collection<Component> components, String name) {
+    private static void requireNoNullElements(Collection<Component> components) {
         for (Component component : components) {
             if (component == null) {
-                throw new IllegalArgumentException(name + " cannot contain null");
+                throw new IllegalArgumentException("Lines cannot contain null");
             }
         }
     }
