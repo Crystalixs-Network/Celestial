@@ -54,6 +54,10 @@ public final class SidebarScoreboard extends GenericNmsScoreboard implements Gen
 
     @Override
     public void destroy() {
+        for (int i = 0; i < lines.size(); i++) {
+            sendTeamPacket(name, i, TeamLifecycle.REMOVE);
+        }
+        sendObjectivePacket(ObjectiveLifecycle.REMOVE, name, title);
     }
 
     @Override
