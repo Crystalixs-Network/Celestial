@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static net.kyori.adventure.text.Component.empty;
+import static net.kyori.adventure.text.Component.space;
 
 public final class SidebarScoreboard extends GenericNmsScoreboard implements GenericScoreboard {
 
@@ -201,7 +202,11 @@ public final class SidebarScoreboard extends GenericNmsScoreboard implements Gen
 
     private void sendLineChange(int score) {
         Component line = lineByScore(this.lines, score);
-        sendTeamPacket(name, score, TeamLifecycle.UPDATE, line, null);
+        Component scoreText = lineByScore(this.scores, score);
+        boolean hasScore = scoreText != null && !scoreText.equals(empty());
+
+        Component lineWithPadding = hasScore ? line.append(space()) : line;
+        sendTeamPacket(name, score, TeamLifecycle.UPDATE, lineWithPadding, null);
     }
 
     private void sendInitialLines() {
