@@ -48,4 +48,8 @@ public interface Scoreboard {
 
         T lines(@NotNull Collection<@NotNull Component> lines);
     }
+
+    static GenericScoreboard.Builder sidebar() {
+        return new SidebarScoreboardBuilder();
+    }
 }
