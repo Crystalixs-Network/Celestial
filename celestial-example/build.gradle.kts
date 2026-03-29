@@ -1,5 +1,6 @@
 plugins {
     java
+    alias(libs.plugins.shadow)
     alias(libs.plugins.runPaper)
     alias(libs.plugins.resourceFactory)
 }
@@ -10,6 +11,10 @@ dependencies {
 }
 
 tasks {
+    shadowJar {
+        relocate("net.crystalixs.celestial.api", "net.crystalixs.celestial.example.api")
+    }
+
     runServer {
         minecraftVersion("1.21.11")
     }
