@@ -1,5 +1,6 @@
 [plugins]
 paperweight = { id = "io.papermc.paperweight.userdev", version = "2.0.0-beta.19" }
+runPaper = { id = "xyz.jpenilla.run-paper", version = "3.0.2" }
 
 [libraries]
 paper = { group = "io.papermc.paper", name = "paper-api", version = "1.21.11-R0.1-SNAPSHOT" }
