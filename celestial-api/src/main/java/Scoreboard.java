@@ -37,4 +37,13 @@ public interface Scoreboard {
 
     void removeScore(int line);
 
+    interface Builder<T> {
+        T title(@NotNull Component title);
+
+        T emptyLine();
+
+        T line(@NotNull Component line);
+
+        T lines(@NotNull Collection<@NotNull Component> lines);
+    }
 }
