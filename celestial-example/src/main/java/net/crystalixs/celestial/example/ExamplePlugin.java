@@ -24,7 +24,7 @@ public final class ExamplePlugin extends JavaPlugin implements Listener {
         Player player = event.getPlayer();
 
         Scoreboard scoreboard = Scoreboard.sidebar()
-                .usePlayer(player)
+                .withPlayer(player)
                 .lines(List.of(
                         empty(),
                         text("Test"),
