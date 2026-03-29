@@ -62,6 +62,8 @@ public final class SidebarScoreboard extends GenericNmsScoreboard implements Gen
 
     @Override
     public void updateTitle(@NotNull Component title) {
+        this.title = title;
+        sendObjectivePacket(ObjectiveLifecycle.UPDATE, name, title);
     }
 
     @Override
