@@ -18,10 +18,14 @@ public interface GenericScoreboard extends Scoreboard {
         @Override
         Builder line(@NotNull Component line);
 
+        Builder line(@NotNull Component line, @NotNull Component score);
+
         @Override
         Builder lines(@NotNull Collection<@NotNull Component> lines);
 
-        Builder usePlayer(Player player);
+        Builder lines(@NotNull Collection<@NotNull Component> lines, @NotNull Collection<@NotNull Component> scores);
+
+        Builder withPlayer(Player player);
 
         @NotNull GenericScoreboard build();
     }
