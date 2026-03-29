@@ -1,8 +1,8 @@
-package net.crystalixs.foo.paper;
+package net.crystalixs.celestial.paper;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class FooPlugin extends JavaPlugin {
+public class ScoreboardTestPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {

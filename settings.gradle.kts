@@ -1,5 +1,4 @@
-rootProject.name = "java-multi-module-project-template"
+rootProject.name = "Celestial"
 
 include("common")
 include("paper")
-include("velocity")
