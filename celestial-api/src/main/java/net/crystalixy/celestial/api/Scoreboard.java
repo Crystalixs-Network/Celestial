@@ -1,3 +1,5 @@
+package net.crystalixy.celestial.api;
+
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
