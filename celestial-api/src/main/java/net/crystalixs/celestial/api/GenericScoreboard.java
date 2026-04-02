@@ -1,4 +1,4 @@
-package net.crystalixy.celestial.api;
+package net.crystalixs.celestial.api;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
