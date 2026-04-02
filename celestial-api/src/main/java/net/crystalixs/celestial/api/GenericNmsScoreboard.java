@@ -1,4 +1,4 @@
-package net.crystalixy.celestial.api;
+package net.crystalixs.celestial.api;
 
 import io.papermc.paper.adventure.PaperAdventure;
 import net.kyori.adventure.text.Component;
