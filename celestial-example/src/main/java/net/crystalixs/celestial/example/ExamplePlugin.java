@@ -1,6 +1,6 @@
 package net.crystalixs.celestial.example;
 
-import net.crystalixy.celestial.api.Scoreboard;
+import net.crystalixs.celestial.api.Scoreboard;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.translation.MiniMessageTranslationStore;
