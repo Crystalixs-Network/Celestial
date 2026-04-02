@@ -59,7 +59,7 @@ ___
 ### 1. Scoreboard erstellen und anzeigen
 
 ```java
-import net.crystalixy.celestial.api.Scoreboard;
+import net.crystalixs.celestial.api.Scoreboard;
 import net.kyori.adventure.text.Component;
 
 Scoreboard scoreboard = Scoreboard.sidebar()
